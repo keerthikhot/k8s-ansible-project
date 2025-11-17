@@ -1,0 +1,30 @@
+services:
+  ansible-controller:
+    image: ubuntu:22.04
+    container_name: ansible-controller
+    privileged: true
+    volumes:
+      - ../:/workspace
+    command: ["sleep", "infinity"]
+
+  k8s-master:
+    build:
+      context: ./
+      dockerfile: Dockerfile.node
+    container_name: k8s-master
+    privileged: true
+
+  k8s-worker1:
+    build:
+      context: ./
+      dockerfile: Dockerfile.node
+    container_name: k8s-worker1
+    privileged: true
+
+  k8s-worker2:
+    build:
+      context: ./
+      dockerfile: Dockerfile.node
+    container_name: k8s-worker2
+    privileged: true
+
