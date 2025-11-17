@@ -1,0 +1,14 @@
+- name: Copy audit policy
+  template:
+    src: audit-policy.yaml.j2
+    dest: /etc/kubernetes/audit-policy.yaml
+    mode: '0644'
+
+- name: Ensure kube-apiserver manifest includes audit flags
+  become: true
+  lineinfile:
+    path: /etc/kubernetes/manifests/kube-apiserver.yaml
+    insertafter: 'spec:'
+    line: '--audit-policy-file=/etc/kubernetes/audit-policy.yaml'
+  ignore_errors: yes
+

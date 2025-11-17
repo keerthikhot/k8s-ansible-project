@@ -1,0 +1,38 @@
+- name: Ensure kubeadm config available
+  template:
+    src: kubeadm-config.yaml.j2
+    dest: /root/kubeadm-config.yaml
+    mode: '0644'
+
+- name: Initialize control plane
+  command: kubeadm init --config=/root/kubeadm-config.yaml --ignore-preflight-errors=all
+  register: kubeadm_init
+  failed_when: kubeadm_init.rc != 0 and 'already initialized' not in kubeadm_init.stdout
+
+- name: Create .kube dir
+  file:
+    path: /root/.kube
+    state: directory
+    mode: '0700'
+
+- name: Copy admin.conf to root kubeconfig
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /root/.kube/config
+    remote_src: yes
+    mode: '0600'
+
+- name: Get join command
+  command: kubeadm token create --print-join-command
+  register: join_cmd
+
+- name: Save join command to file for hostvars
+  copy:
+    content: "{{ join_cmd.stdout }}"
+    dest: /root/join_cmd.sh
+    mode: '0700'
+
+- name: Set fact with join_cmd (so other hosts can access via hostvars)
+  set_fact:
+    kube_join_cmd: "{{ join_cmd.stdout }}"
+

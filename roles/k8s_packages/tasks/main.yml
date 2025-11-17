@@ -1,0 +1,32 @@
+- name: Add Kubernetes apt key
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: Add Kubernetes apt repo
+  apt_repository:
+    repo: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+    state: present
+
+- name: Install kube components
+  apt:
+    name:
+      - kubelet={{ kube_version }}
+      - kubeadm={{ kube_version }}
+      - kubectl={{ kube_version }}
+    state: present
+    update_cache: yes
+
+- name: Hold kube packages
+  apt:
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+    state: present
+    mark_hold: yes
+
+- name: Disable swap (required by kube)
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+

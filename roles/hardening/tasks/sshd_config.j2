@@ -1,0 +1,10 @@
+# Minimal hardened sshd config
+Port 22
+Protocol 2
+PermitRootLogin prohibit-password
+PasswordAuthentication yes
+ChallengeResponseAuthentication no
+UsePAM yes
+X11Forwarding no
+AcceptEnv LANG LC_*
+Subsystem sftp /usr/lib/openssh/sftp-server

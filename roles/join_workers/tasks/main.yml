@@ -1,0 +1,24 @@
+- name: Wait for master admin.conf to be present
+  wait_for:
+    path: /etc/kubernetes/admin.conf
+    search_regex: ""
+    timeout: 300
+  delegate_to: k8s-master
+  run_once: true
+
+- name: Fetch join command file from master
+  slurp:
+    src: /root/join_cmd.sh
+  delegate_to: k8s-master
+  register: join_file
+  run_once: true
+
+- name: Save join command locally
+  copy:
+    content: "{{ join_file.content | b64decode }}"
+    dest: /root/join_cmd.sh
+    mode: '0700'
+
+- name: Run kubeadm join on worker
+  command: sh /root/join_cmd.sh --ignore-preflight-errors=all
+
