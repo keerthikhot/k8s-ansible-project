@@ -1,0 +1,8 @@
+- hosts: master
+  become: true
+  roles:
+    - cni_calico
+    - metrics_server
+    - dashboard
+    - audit_logging
+
